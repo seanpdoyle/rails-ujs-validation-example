@@ -14,10 +14,21 @@
   <%= render form %>
 <% end %>
 
+<h1>New Message (render custom validation messages client-side)</h1>
+
+<%= form_with(model: message, html: { id: "custom_validation_new_message_form" }) do |form| %>
+  <template data-validation-message-template="custom_validation_new_message_form"
+            data-validation-messages="<%= render(formats: :json, partial: "validation_messages") %>">
+    <span style="color: red;"></span>
+  </template>
+
+  <%= render form %>
+<% end %>
+
 <h1>New Message (render validation elements server-side)</h1>
 
 <%= form_with(model: message, builder: ValidationMessageFormBuilder, html: { id: "server_side_new_message_form" }) do |form| %>
-  <%= form.validation_message_template do |object, attribute| %>
+  <%= form.validation_message_template data: { validation_messages: render(formats: :json, partial: "validation_messages") } do |object, attribute| %>
     <span style="color: red;"><%= object.errors[attribute].to_sentence %></span>
   <% end %>
 

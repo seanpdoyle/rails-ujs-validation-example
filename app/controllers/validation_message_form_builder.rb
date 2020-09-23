@@ -21,14 +21,16 @@ class ValidationMessageFormBuilder < ActionView::Helpers::FormBuilder
     super attribute, *arguments, **validation_attributes(attribute).with_defaults(attributes)
   end
 
-  def validation_message_template(&block)
+  def validation_message_template(data: {}, **attributes, &block)
     @validation_message_template = block
 
     content = @template.with_output_buffer do
       @validation_message_template.call(NULL_OBJECT, NULL_OBJECT)
     end
 
-    @template.tag.template content, data: { validation_message_template: id }
+    data_attribute = data.with_defaults(validation_message_template: id)
+
+    @template.tag.template content, data: data_attribute, **attributes
   end
 
   def validation_message(attribute)

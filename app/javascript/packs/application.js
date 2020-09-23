@@ -31,8 +31,11 @@ document.addEventListener("turbolinks:load", () => {
         const validationMessageElement = document.getElementById(validationMessageId) || validationMessageTemplateElement
 
         if (validationMessageElement) {
+          const validationMessages = JSON.parse(validationMessageTemplate?.dataset.validationMessages || "{}")
+          const [ _, validationMessage ] = Object.entries(validationMessages).find(([ key ]) => input.validity[key]) || [ null, input.validationMessage ]
+
           validationMessageElement.id = validationMessageId
-          validationMessageElement.innerHTML = input.validationMessage
+          validationMessageElement.innerHTML = validationMessage
 
           input.setAttribute("aria-describedby", validationMessageElement.id)
           input.setAttribute("aria-invalid", "true")
