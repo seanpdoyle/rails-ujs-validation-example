@@ -22,6 +22,27 @@ require("@rails/actiontext")
 document.addEventListener("turbolinks:load", () => {
   for (const form of document.querySelectorAll("form")) {
     for (const input of form.elements) {
+      input.addEventListener("invalid", (event) => {
+        const input = event.target
+        const form = input.form
+        const validationMessageId = [form.id, input.id, "validation_message"].join("_")
+        const validationMessageTemplate = form.querySelector(`[data-validation-message-template="${form.id}"]`)
+        const validationMessageTemplateElement = validationMessageTemplate?.content.children[0].cloneNode()
+        const validationMessageElement = document.getElementById(validationMessageId) || validationMessageTemplateElement
+
+        if (validationMessageElement) {
+          validationMessageElement.id = validationMessageId
+          validationMessageElement.innerHTML = input.validationMessage
+
+          input.setAttribute("aria-describedby", validationMessageElement.id)
+
+          validationMessageElement.remove()
+          input.parentElement.append(validationMessageElement)
+
+          event.preventDefault()
+        }
+      })
+
       const { validationMessage } = input.dataset
 
       if (validationMessage) {
