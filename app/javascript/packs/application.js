@@ -18,3 +18,22 @@ require("channels")
 
 require("trix")
 require("@rails/actiontext")
+
+document.addEventListener("turbolinks:load", () => {
+  for (const form of document.querySelectorAll("form")) {
+    for (const input of form.elements) {
+      const { validationMessage } = input.dataset
+
+      if (validationMessage) {
+        input.setCustomValidity(validationMessage)
+        input.reportValidity()
+      }
+    }
+  }
+})
+
+document.addEventListener("input", ({ target }) => {
+  if (target.matches("[data-validation-message]")) {
+    target.setCustomValidity("")
+  }
+})
