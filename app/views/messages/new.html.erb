@@ -4,7 +4,7 @@
   <%= render form %>
 <% end %>
 
-<h1>New Message (validation elements)</h1>
+<h1>New Message (render validation elements client-side)</h1>
 
 <%= form_with(model: message, html: { id: "new_message_form" }) do |form| %>
   <template data-validation-message-template="new_message_form">
@@ -12,4 +12,40 @@
   </template>
 
   <%= render form %>
+<% end %>
+
+<h1>New Message (render validation elements server-side)</h1>
+
+<%= form_with(model: message, builder: ValidationMessageFormBuilder, html: { id: "server_side_new_message_form" }) do |form| %>
+  <%= form.validation_message_template do |object, attribute| %>
+    <span style="color: red;"><%= object.errors[attribute].to_sentence %></span>
+  <% end %>
+
+  <fieldset>
+    <div style="display: flex;">
+      <%= form.label :recipient %>
+      <%= form.validation_message :recipient %>
+    </div>
+
+    <%= form.email_field :recipient, required: true %>
+  </fieldset>
+
+  <fieldset>
+    <div style="display: flex;">
+      <%= form.label :subject %>
+      <%= form.validation_message :subject %>
+    </div>
+
+    <%= form.text_field :subject, required: true %>
+  </fieldset>
+
+  <fieldset>
+    <legend><%= form.label :content %></legend>
+
+    <div>
+      <%= form.text_area :content %>
+    </div>
+  </fieldset>
+
+  <%= form.button %>
 <% end %>

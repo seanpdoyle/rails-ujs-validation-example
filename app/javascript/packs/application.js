@@ -20,7 +20,7 @@ require("trix")
 require("@rails/actiontext")
 
 document.addEventListener("turbolinks:load", () => {
-  for (const form of document.querySelectorAll("form")) {
+  for (const form of document.querySelectorAll("form:not([novalidate])")) {
     for (const input of form.elements) {
       input.addEventListener("invalid", (event) => {
         const input = event.target
@@ -35,17 +35,30 @@ document.addEventListener("turbolinks:load", () => {
           validationMessageElement.innerHTML = input.validationMessage
 
           input.setAttribute("aria-describedby", validationMessageElement.id)
+          input.setAttribute("aria-invalid", "true")
 
-          validationMessageElement.remove()
-          input.parentElement.append(validationMessageElement)
+          if (!validationMessageElement.parentElement) {
+            input.parentElement.append(validationMessageElement)
+          }
 
           event.preventDefault()
         }
       })
 
-      const { validationMessage } = input.dataset
+      const { validationMessage, willValidate } = input.dataset
 
       if (validationMessage) {
+        input.setCustomValidity(validationMessage)
+        input.reportValidity()
+      } else if (willValidate) {
+        const ariaDescribedby = input.getAttribute("aria-describedby") || ""
+        const describedByIds = ariaDescribedby.split(" ").filter(id => id)
+        const validationMessageElements = describedByIds.length ?
+          document.querySelectorAll(describedByIds.map(id => "#" + id).join(",")) :
+          []
+        const validationMessage = Array.from(validationMessageElements).
+          map(element => element.textContent).join(" ")
+
         input.setCustomValidity(validationMessage)
         input.reportValidity()
       }
